@@ -1,0 +1,55 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rowLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.bar {
+  flex: 1;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  display: flex;
+  background: var(--border);
+}
+.dashed {
+  opacity: .55;
+  border: 1.5px dashed var(--text-muted);
+}
+
+.segment {
+  height: 100%;
+  transition: width .5s ease;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
