@@ -1,0 +1,65 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.row:last-child { border-bottom: none; }
+
+.iconWrap {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.middle {
+  flex: 1;
+  min-width: 0;
+}
+.topLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+.badgeUp { color: var(--danger); background: var(--danger-light); }
+.badgeDown { color: var(--success); background: var(--success-light); }
+
+.track {
+  height: 5px;
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width .5s ease;
+}
+
+.amount {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.limit {
+  font-weight: 400;
+  color: var(--text-muted);
+}

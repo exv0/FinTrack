@@ -1,0 +1,45 @@
+.bar {
+  position: fixed;
+  top: var(--topbar-h);
+  left: var(--sidebar-w);
+  right: 0;
+  height: 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px;
+  z-index: 80;
+}
+
+.label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.track {
+  width: 160px;
+  height: 5px;
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width .5s ease, background .3s ease;
+}
+
+.percent {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.days {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
