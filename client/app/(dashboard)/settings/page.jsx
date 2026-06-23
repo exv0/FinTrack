@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { useTheme } from '@/context/ThemeContext'
 import { authApi, transactionsApi } from '@/lib/api'
 import Toggle from '@/components/settings/Toggle'
 import SettingsCard from '@/components/settings/SettingsCard'
@@ -24,9 +25,7 @@ export default function SettingsPage() {
     savingsReminders: true,
     spendingInsights: true,
   })
-  const [theme, setTheme] = useState('Light')
-  const [accentColor, setAccentColor] = useState(ACCENT_COLORS[0])
-  const [compactView, setCompactView] = useState(false)
+  const { themePref, accent, density, setThemePreference, setAccent, setDensity } = useTheme()
   const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
@@ -178,13 +177,13 @@ export default function SettingsPage() {
             <div className={styles.fieldRow}>
               <span className={styles.fieldLabel}>Theme</span>
               <div className={styles.themePills}>
-                {['Light', 'Dark', 'System'].map(t => (
+                {[{ label: 'Light', value: 'light' }, { label: 'Dark', value: 'dark' }, { label: 'System', value: 'system' }].map(({ label, value }) => (
                   <button
-                    key={t}
-                    className={`${styles.themePill} ${theme === t ? styles.themeActive : ''}`}
-                    onClick={() => setTheme(t)}
+                    key={value}
+                    className={`${styles.themePill} ${themePref === value ? styles.themeActive : ''}`}
+                    onClick={() => setThemePreference(value)}
                   >
-                    {t}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -192,7 +191,10 @@ export default function SettingsPage() {
 
             <div className={styles.toggleRow}>
               <span className={styles.toggleLabel}>Compact view</span>
-              <Toggle checked={compactView} onChange={setCompactView} />
+              <Toggle
+                checked={density === 'compact'}
+                onChange={(checked) => setDensity(checked ? 'compact' : 'comfortable')}
+              />
             </div>
 
             <div className={styles.fieldRow}>
@@ -201,9 +203,9 @@ export default function SettingsPage() {
                 {ACCENT_COLORS.map(c => (
                   <button
                     key={c}
-                    className={`${styles.swatch} ${accentColor === c ? styles.swatchActive : ''}`}
+                    className={`${styles.swatch} ${accent === c ? styles.swatchActive : ''}`}
                     style={{ background: c }}
-                    onClick={() => setAccentColor(c)}
+                    onClick={() => setAccent(c)}
                     aria-label={`Set accent colour ${c}`}
                   />
                 ))}

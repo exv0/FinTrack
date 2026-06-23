@@ -28,7 +28,7 @@
 .statRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: var(--card-gap);
   margin-bottom: 24px;
 }
 
@@ -36,13 +36,13 @@
 .row2 {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 16px;
+  gap: var(--card-gap);
 }
 
 .rightCol {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--card-gap);
 }
 
 /* ── Card ── */
@@ -50,7 +50,7 @@
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: 20px;
+  padding: var(--card-padding);
 }
 
 .cardHeader {

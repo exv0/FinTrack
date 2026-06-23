@@ -32,11 +32,11 @@
 .banner {
   background: var(--primary);
   border-radius: var(--radius-card);
-  padding: 20px;
+  padding: var(--card-padding);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--card-gap);
   flex-wrap: wrap;
 }
 .bannerLabel {
@@ -71,7 +71,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: var(--card-gap);
   margin-bottom: 20px;
 }
 
@@ -83,7 +83,7 @@
   padding: 18px 20px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--card-gap);
 }
 .progressLabel {
   font-size: 12.5px;
@@ -121,7 +121,7 @@
 .glossaryWrap {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--card-gap);
 }
 .searchWrap {
   position: relative;
