@@ -1,0 +1,53 @@
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  display: flex; align-items: center; gap: 6px;
+  background: none;
+  border: none;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: var(--font);
+  padding: 4px 0;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  box-shadow: var(--shadow-card);
+  padding: 6px;
+  z-index: 50;
+  animation: dropIn .15s ease;
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font);
+  text-align: left;
+  transition: background var(--t), color var(--t);
+}
+.item:hover { background: var(--bg); color: var(--text-primary); }
+
+.check { color: var(--accent); flex-shrink: 0; }
