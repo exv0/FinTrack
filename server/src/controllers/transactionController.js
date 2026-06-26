@@ -52,6 +52,47 @@ export const getSummary = catchAsync(async (req, res) => {
   res.json({ success: true, data: summary })
 })
 
+// GET /api/transactions/category-comparison?month=&year=
+// Returns each expense category's spend this month vs last month, plus % change —
+// feeds the MoM badges (↑23% / ↓5%) on the Spending page.
+export const getCategoryComparison = catchAsync(async (req, res) => {
+  const month = Number(req.query.month) || new Date().getMonth() + 1
+  const year  = Number(req.query.year)  || new Date().getFullYear()
+
+  const currentStart = new Date(year, month - 1, 1)
+  const currentEnd   = new Date(year, month, 0, 23, 59, 59)
+
+  const prevDate = new Date(year, month - 2, 1)
+  const prevStart = new Date(prevDate.getFullYear(), prevDate.getMonth(), 1)
+  const prevEnd   = new Date(prevDate.getFullYear(), prevDate.getMonth() + 1, 0, 23, 59, 59)
+
+  const [current, previous] = await Promise.all([
+    Transaction.aggregate([
+      { $match: { user: req.user._id, type: 'expense', date: { $gte: currentStart, $lte: currentEnd } } },
+      { $group: { _id: '$category', total: { $sum: '$amount' } } },
+    ]),
+    Transaction.aggregate([
+      { $match: { user: req.user._id, type: 'expense', date: { $gte: prevStart, $lte: prevEnd } } },
+      { $group: { _id: '$category', total: { $sum: '$amount' } } },
+    ]),
+  ])
+
+  const prevMap = Object.fromEntries(previous.map(p => [p._id, p.total]))
+
+  const comparison = current.map(c => {
+    const prevTotal = prevMap[c._id] || 0
+    let changePct = null
+    if (prevTotal > 0) {
+      changePct = Math.round(((c.total - prevTotal) / prevTotal) * 100)
+    } else if (c.total > 0) {
+      changePct = 100 // new category this month, no prior spend to compare against
+    }
+    return { category: c._id, current: c.total, previous: prevTotal, changePct }
+  })
+
+  res.json({ success: true, data: comparison })
+})
+
 // GET /api/transactions/monthly-trend?months=5
 // Returns income vs expense totals per month for the last N months — feeds the bar chart
 export const getMonthlyTrend = catchAsync(async (req, res) => {
