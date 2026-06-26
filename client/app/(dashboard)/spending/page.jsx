@@ -43,6 +43,7 @@ export default function SpendingPage() {
   const [period, setPeriod] = useState('This month')
   const [transactions, setTransactions] = useState([])
   const [budgets, setBudgets] = useState([])
+  const [comparison, setComparison] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -52,12 +53,14 @@ export default function SpendingPage() {
       setError('')
       try {
         const { month, year } = getMonthYearForPeriod(period)
-        const [txnRes, budgetRes] = await Promise.all([
+        const [txnRes, budgetRes, comparisonRes] = await Promise.all([
           transactionsApi.list({ type: 'expense', month, year }),
           budgetsApi.withSpend({ month, year }),
+          transactionsApi.categoryComparison({ month, year }),
         ])
         setTransactions(txnRes.data)
         setBudgets(budgetRes.data)
+        setComparison(comparisonRes.data)
       } catch {
         setError('Could not load spending data.')
       } finally {
@@ -86,10 +89,12 @@ export default function SpendingPage() {
 
   const donutTotal = donutData.reduce((sum, d) => sum + d.value, 0)
 
-  // Ranked categories — merge budget limits with actual transactions for expand-on-tap
+  // Ranked categories — merge budget limits, real MoM comparison, and actual
+  // transactions (for the expand-on-tap list) into one structure per category.
   const rankedCategories = useMemo(() => {
     return donutData.map((d, i) => {
       const budget = budgets.find(b => b.category === d.name)
+      const comparisonEntry = comparison.find(c => c.category === d.name)
       const categoryTxns = transactions
         .filter(t => t.category === d.name)
         .map(t => ({ name: t.merchant || t.category, amount: t.amount }))
@@ -100,12 +105,12 @@ export default function SpendingPage() {
         name: d.name,
         spent: d.value,
         limit: budget?.limit || d.value,
-        changePct: null, // MoM comparison requires previous-month data — wire up later if needed
+        changePct: comparisonEntry?.changePct ?? null,
         unusual: budget ? budget.percentUsed >= 90 : false,
         transactions: categoryTxns,
       }
     })
-  }, [donutData, budgets, transactions])
+  }, [donutData, budgets, comparison, transactions])
 
   const topCategory = donutData[0]
 
