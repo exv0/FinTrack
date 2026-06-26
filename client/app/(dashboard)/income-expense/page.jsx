@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Plus } from 'lucide-react'
 import { transactionsApi } from '@/lib/api'
+import { useLocale } from '@/context/LocaleContext'
 import StatCard from '@/components/dashboard/StatCard'
 import MonthlyBarChart from '@/components/income-expense/MonthlyBarChart'
 import SplitComparison from '@/components/income-expense/SplitComparison'
@@ -38,6 +39,7 @@ function buildMonthlyData(trendRaw, monthsBack) {
 }
 
 export default function IncomeExpensePage() {
+  const { money } = useLocale()
   const [period, setPeriod] = useState('Last 5 months')
   const [monthlyData, setMonthlyData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -108,12 +110,12 @@ export default function IncomeExpensePage() {
         <>
           {/* Row 1 — 3 stat cards */}
           <div className={styles.statRow}>
-            <StatCard label="Total income" value={`NPR ${totalIncome.toLocaleString('en-US')}`} subLabel="This month" />
-            <StatCard label="Total expenses" value={`NPR ${totalExpenses.toLocaleString('en-US')}`} subLabel="This month" />
+            <StatCard label="Total income" value={money(totalIncome)} subLabel="This month" />
+            <StatCard label="Total expenses" value={money(totalExpenses)} subLabel="This month" />
             <div className={styles.netCard}>
               <span className={styles.netLabel}>Net balance</span>
               <span className={styles.netValue}>
-                {netBalance >= 0 ? '+' : ''}NPR {netBalance.toLocaleString('en-US')}
+                {netBalance >= 0 ? '+' : ''}{money(netBalance)}
               </span>
               <span className={styles.healthBadge} style={{ color: health.color, background: health.bg }}>
                 {health.emoji} {health.label}
@@ -136,7 +138,7 @@ export default function IncomeExpensePage() {
               <div className={styles.card}>
                 <span className={styles.smallLabel}>Net balance this month</span>
                 <span className={styles.bigNumber} style={{ color: netBalance >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-                  {netBalance >= 0 ? '+' : ''}NPR {netBalance.toLocaleString('en-US')}
+                  {netBalance >= 0 ? '+' : ''}{money(netBalance)}
                 </span>
                 <span className={styles.savingsNote}>
                   You&apos;re saving {savingsPct}% of income
