@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Pencil, Plus } from 'lucide-react'
+import { useLocale } from '@/context/LocaleContext'
 import styles from './GoalCard.module.css'
 
 const MILESTONES = [25, 50, 75, 100]
@@ -29,6 +30,7 @@ function suggestedWeeklySaving(targetAmount, savedAmount, deadline) {
 }
 
 export default function GoalCard({ goal, onAddFunds, onEdit }) {
+  const { money } = useLocale()
   const { name, targetAmount, savedAmount, deadline, streakWeeks, photo, completed } = goal
   const pct = Math.min(Math.round((savedAmount / targetAmount) * 100), 100)
   const weeklySuggestion = suggestedWeeklySaving(targetAmount, savedAmount, deadline)
@@ -45,7 +47,7 @@ export default function GoalCard({ goal, onAddFunds, onEdit }) {
       <div className={styles.body}>
         <h3 className={styles.name}>{name}</h3>
         <span className={styles.targetLine}>
-          Target: NPR {targetAmount.toLocaleString('en-US')}
+          Target: {money(targetAmount)}
           {deadline && ` · Due ${new Date(deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
         </span>
 
@@ -73,7 +75,7 @@ export default function GoalCard({ goal, onAddFunds, onEdit }) {
         </div>
 
         <div className={styles.savedLine}>
-          <span className={styles.savedAmount}>NPR {savedAmount.toLocaleString('en-US')}</span>
+          <span className={styles.savedAmount}>{money(savedAmount)}</span>
           <span className={styles.savedPct}>{pct}% saved</span>
         </div>
 
@@ -83,7 +85,7 @@ export default function GoalCard({ goal, onAddFunds, onEdit }) {
 
         {weeklySuggestion > 0 && !completed && (
           <div className={styles.suggestionCard}>
-            💡 Save NPR {weeklySuggestion.toLocaleString('en-US')}/week to hit goal
+            💡 Save {money(weeklySuggestion)}/week to hit goal
           </div>
         )}
 
