@@ -1,21 +1,27 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useLocale } from '@/context/LocaleContext'
 import { CURRENCIES, DATE_FORMATS } from '@/lib/format'
 import { authApi, transactionsApi } from '@/lib/api'
+import { exportTransactionsToCSV } from '@/lib/exportCsv'
 import Toggle from '@/components/settings/Toggle'
 import Dropdown from '@/components/settings/Dropdown'
 import SettingsCard from '@/components/settings/SettingsCard'
+import EditProfileModal from '@/components/settings/EditProfileModal'
+import ChangePasswordModal from '@/components/settings/ChangePasswordModal'
+import DeleteAccountModal from '@/components/settings/DeleteAccountModal'
 import styles from './settings.module.css'
 
 const ALERT_THRESHOLDS = [50, 60, 70, 80, 90]
 const ACCENT_COLORS = ['#4F46E5', '#16A34A', '#D97706', '#DC2626', '#9333EA']
 
 export default function SettingsPage() {
-  const { user, updateUser } = useAuth()
+  const router = useRouter()
+  const { user, updateUser, logout } = useAuth()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -30,6 +36,9 @@ export default function SettingsPage() {
   const { themePref, accent, density, setThemePreference, setAccent, setDensity } = useTheme()
   const { currency, dateFormat, setCurrency, setDateFormat, date } = useLocale()
   const [exporting, setExporting] = useState(false)
+  const [showEditProfile, setShowEditProfile] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false)
 
   useEffect(() => {
     if (user?.notificationPrefs) {
@@ -68,22 +77,27 @@ export default function SettingsPage() {
     setExporting(true)
     try {
       const { data } = await transactionsApi.list({})
-      const header = 'Date,Type,Category,Merchant,Amount (NPR)\n'
-      const rows = data.map(t =>
-        `${date(t.date)},${t.type},${t.category},"${t.merchant || ''}",${t.amount}`
-      ).join('\n')
-      const blob = new Blob([header + rows], { type: 'text/csv' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'fintrack-transactions.csv'
-      a.click()
-      URL.revokeObjectURL(url)
+      exportTransactionsToCSV(data, date, 'fintrack-transactions.csv')
     } catch {
       setError('Could not export data.')
     } finally {
       setExporting(false)
     }
+  }
+
+  const handleSaveProfile = async (payload) => {
+    const { user: updatedUser } = await authApi.updateMe(payload)
+    updateUser(updatedUser)
+  }
+
+  const handleChangePassword = async (payload) => {
+    await authApi.changePassword(payload)
+  }
+
+  const handleDeleteAccount = async (password) => {
+    await authApi.deleteAccount({ password })
+    await logout() // clears local session state
+    router.replace('/login')
   }
 
   const initials = user
@@ -112,8 +126,8 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className={styles.btnRow}>
-              <button className={styles.ghostBtn}>Edit profile</button>
-              <button className={styles.ghostBtn}>Change password</button>
+              <button className={styles.ghostBtn} onClick={() => setShowEditProfile(true)}>Edit profile</button>
+              <button className={styles.ghostBtn} onClick={() => setShowChangePassword(true)}>Change password</button>
             </div>
           </SettingsCard>
 
@@ -221,10 +235,35 @@ export default function SettingsPage() {
             <button className={styles.ghostBtnFull} onClick={handleExportCSV} disabled={exporting}>
               {exporting ? 'Exporting…' : 'Export all data (CSV)'}
             </button>
-            <button className={styles.dangerBtnFull}>Delete account</button>
+            <button className={styles.dangerBtnFull} onClick={() => setShowDeleteAccount(true)}>
+              Delete account
+            </button>
           </SettingsCard>
         </div>
       </div>
+
+      {showEditProfile && (
+        <EditProfileModal
+          user={user}
+          onClose={() => setShowEditProfile(false)}
+          onSave={handleSaveProfile}
+        />
+      )}
+
+      {showChangePassword && (
+        <ChangePasswordModal
+          onClose={() => setShowChangePassword(false)}
+          onSave={handleChangePassword}
+        />
+      )}
+
+      {showDeleteAccount && (
+        <DeleteAccountModal
+          userEmail={user?.email}
+          onClose={() => setShowDeleteAccount(false)}
+          onConfirm={handleDeleteAccount}
+        />
+      )}
     </div>
   )
 }
