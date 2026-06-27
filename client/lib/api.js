@@ -26,6 +26,8 @@ export const authApi = {
   logout:   ()     => api.post('/auth/logout').then(r => r.data),
   me:       ()     => api.get('/auth/me').then(r => r.data),
   updateMe: (data) => api.patch('/auth/me', data).then(r => r.data),
+  changePassword: (data) => api.patch('/auth/change-password', data).then(r => r.data),
+  deleteAccount: (data) => api.delete('/auth/me', { data }).then(r => r.data),
   completeOnboarding: (data) => api.patch('/auth/onboarding', data).then(r => r.data),
 }
 
