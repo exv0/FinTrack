@@ -14,9 +14,9 @@ const CATEGORIES = [
 // Only warn once a category would cross this threshold after the new transaction
 const WARNING_THRESHOLD = 90
 
-export default function LogExpenseModal({ onClose, onCreate }) {
+export default function LogExpenseModal({ onClose, onCreate, defaultType = 'expense' }) {
   const [form, setForm] = useState({
-    type: 'expense', amount: '', category: 'Food & Dining', merchant: '', note: '',
+    type: defaultType, amount: '', category: defaultType === 'income' ? 'Salary' : 'Food & Dining', merchant: '', note: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
