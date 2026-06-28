@@ -21,6 +21,12 @@
   pointer-events: none;
 }
 
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .tag {
   width: fit-content;
   font-size: 11px;
@@ -30,6 +36,20 @@
   padding: 3px 10px;
   border-radius: var(--radius-pill);
 }
+
+.saveIconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color var(--t), transform var(--t);
+}
+.saveIconBtn:hover { color: var(--accent); transform: scale(1.1); }
+.saveIconActive { color: var(--accent); }
+
 .title {
   font-size: 15px;
   font-weight: 700;
@@ -89,14 +109,3 @@
   color: var(--text-secondary);
   max-width: 180px;
 }
-.unlockLink {
-  font-size: 11.5px;
-  color: var(--accent);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font);
-  text-decoration: underline;
-  transition: color var(--t);
-}
-.unlockLink:hover { color: var(--accent-hover); }
