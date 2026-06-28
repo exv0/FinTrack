@@ -111,7 +111,7 @@ export default function LoginPage() {
 
       <div className={styles.orDivider}><span>or</span></div>
 
-      <button className={styles.btnGhost} type="button">
+      <button className={styles.btnGhost} type="button" disabled title="Google sign-in is not available yet">
         <GoogleIcon />
         Continue with Google
       </button>

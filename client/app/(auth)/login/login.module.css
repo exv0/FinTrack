@@ -170,6 +170,15 @@
   border-color: #d1d5db;
   color: var(--text-primary);
 }
+.btnGhost:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+.btnGhost:disabled:hover {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
 
 /* ── Spinner ── */
 .spinner {
