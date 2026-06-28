@@ -10,6 +10,7 @@ import authRoutes        from './routes/auth.js'
 import transactionRoutes from './routes/transactions.js'
 import goalRoutes        from './routes/goals.js'
 import budgetRoutes      from './routes/budgets.js'
+import savedTipRoutes    from './routes/savedTips.js'
 
 const app = express()
 
@@ -26,6 +27,7 @@ app.use('/api/auth',         authRoutes)
 app.use('/api/transactions', transactionRoutes)
 app.use('/api/goals',        goalRoutes)
 app.use('/api/budgets',      budgetRoutes)
+app.use('/api/saved-tips',   savedTipRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

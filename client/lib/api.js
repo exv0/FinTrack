@@ -58,4 +58,11 @@ export const goalsApi = {
   remove: (id)      => api.delete(`/goals/${id}`).then(r => r.data),
 }
 
+// ── Saved Tips ────────────────────────────────────────
+export const savedTipsApi = {
+  list:   ()      => api.get('/saved-tips').then(r => r.data),
+  save:   (tipId)  => api.post('/saved-tips', { tipId }).then(r => r.data),
+  unsave: (tipId)  => api.delete(`/saved-tips/${tipId}`).then(r => r.data),
+}
+
 export default api
