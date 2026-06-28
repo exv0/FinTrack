@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
+import { useLocale } from '@/context/LocaleContext'
 import { transactionsApi, budgetsApi } from '@/lib/api'
 import BudgetBar from '@/components/dashboard/BudgetBar'
 import StatCard from '@/components/dashboard/StatCard'
@@ -28,7 +30,9 @@ function daysRemainingInMonth() {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { user } = useAuth()
+  const { money } = useLocale()
   const [transactions, setTransactions] = useState([])
   const [budgets, setBudgets]           = useState([])
   const [loading, setLoading]           = useState(true)
@@ -112,12 +116,12 @@ export default function DashboardPage() {
         <div className={styles.statRow}>
           <StatCard
             label="Monthly income"
-            value={`NPR ${income.toLocaleString('en-US')}`}
+            value={money(income)}
             subLabel="This month"
           />
           <StatCard
             label="Total spent"
-            value={`NPR ${totalSpent.toLocaleString('en-US')}`}
+            value={money(totalSpent)}
             subLabel="This month"
           />
           <StatCard
@@ -129,7 +133,7 @@ export default function DashboardPage() {
           <StatCard
             dark
             label="Safe to spend today"
-            value={`NPR ${safeToSpendToday.toLocaleString('en-US')}`}
+            value={money(safeToSpendToday)}
             subLabel={`${daysRemainingInMonth()} days remaining`}
           />
         </div>
@@ -140,7 +144,7 @@ export default function DashboardPage() {
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Budget by category</h2>
-              <button className={styles.ghostBtn}>View all</button>
+              <button className={styles.ghostBtn} onClick={() => router.push('/spending')}>View all</button>
             </div>
             <div>
               {budgets.length === 0 ? (
@@ -165,7 +169,7 @@ export default function DashboardPage() {
             <div className={styles.card}>
               <div className={styles.cardHeader}>
                 <h2 className={styles.cardTitle}>Recent transactions</h2>
-                <button className={styles.ghostBtn}>See all</button>
+                <button className={styles.ghostBtn} onClick={() => router.push('/transactions')}>See all</button>
               </div>
               <div>
                 {recentTransactions.length === 0 ? (
