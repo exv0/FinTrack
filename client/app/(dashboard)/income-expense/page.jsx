@@ -9,6 +9,8 @@ import StatCard from '@/components/dashboard/StatCard'
 import MonthlyBarChart from '@/components/income-expense/MonthlyBarChart'
 import SplitComparison from '@/components/income-expense/SplitComparison'
 import LogExpenseModal from '@/components/transactions/LogExpenseModal'
+import LoadingState from '@/components/ui/LoadingState'
+import ErrorState from '@/components/ui/ErrorState'
 import styles from './income-expense.module.css'
 
 const PERIODS = ['Last 5 months', 'This year']
@@ -112,9 +114,9 @@ export default function IncomeExpensePage() {
       </div>
 
       {loading ? (
-        <p className={styles.loadingText}>Loading…</p>
+        <LoadingState label="Loading income vs expense data…" />
       ) : error ? (
-        <p className={styles.errorText}>{error}</p>
+        <ErrorState message={error} onRetry={load} />
       ) : (
         <>
           {/* Row 1 — 3 stat cards */}
