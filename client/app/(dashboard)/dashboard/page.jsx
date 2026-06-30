@@ -9,6 +9,9 @@ import BudgetBar from '@/components/dashboard/BudgetBar'
 import StatCard from '@/components/dashboard/StatCard'
 import CategoryRow from '@/components/dashboard/CategoryRow'
 import TransactionRow from '@/components/dashboard/TransactionRow'
+import LoadingState from '@/components/ui/LoadingState'
+import EmptyState from '@/components/ui/EmptyState'
+import ErrorState from '@/components/ui/ErrorState'
 import styles from './dashboard.module.css'
 
 // Emoji fallback for categories without a custom icon yet
@@ -38,27 +41,29 @@ export default function DashboardPage() {
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const now = new Date()
-        const month = now.getMonth() + 1
-        const year  = now.getFullYear()
+  const load = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const now = new Date()
+      const month = now.getMonth() + 1
+      const year  = now.getFullYear()
 
-        const [txnRes, budgetRes] = await Promise.all([
-          transactionsApi.list({ month, year }),
-          budgetsApi.withSpend({ month, year }),
-        ])
+      const [txnRes, budgetRes] = await Promise.all([
+        transactionsApi.list({ month, year }),
+        budgetsApi.withSpend({ month, year }),
+      ])
 
-        setTransactions(txnRes.data)
-        setBudgets(budgetRes.data)
-      } catch (err) {
-        setError('Could not load dashboard data. Please try again.')
-      } finally {
-        setLoading(false)
-      }
+      setTransactions(txnRes.data)
+      setBudgets(budgetRes.data)
+    } catch (err) {
+      setError('Could not load dashboard data. Please try again.')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     load()
 
     // Refresh dashboard data whenever a new transaction is logged from the Topbar
@@ -92,19 +97,11 @@ export default function DashboardPage() {
   }, [budgets])
 
   if (loading) {
-    return (
-      <div className={styles.loadingWrap}>
-        <span className={styles.loadingText}>Loading your dashboard…</span>
-      </div>
-    )
+    return <LoadingState label="Loading your dashboard…" />
   }
 
   if (error) {
-    return (
-      <div className={styles.errorWrap}>
-        <p>{error}</p>
-      </div>
-    )
+    return <ErrorState message={error} onRetry={load} />
   }
 
   return (
@@ -148,7 +145,13 @@ export default function DashboardPage() {
             </div>
             <div>
               {budgets.length === 0 ? (
-                <p className={styles.emptyText}>No budgets set yet. Add one to start tracking.</p>
+                <EmptyState
+                  icon="📊"
+                  title="No budgets set yet"
+                  body="Add a category budget to start tracking your spending limits."
+                  actionLabel="Go to Spending"
+                  onAction={() => router.push('/spending')}
+                />
               ) : (
                 budgets.map(b => (
                   <CategoryRow
@@ -173,7 +176,11 @@ export default function DashboardPage() {
               </div>
               <div>
                 {recentTransactions.length === 0 ? (
-                  <p className={styles.emptyText}>No transactions logged yet.</p>
+                  <EmptyState
+                    icon="🧾"
+                    title="No transactions yet"
+                    body="Log your first expense or income to see it here."
+                  />
                 ) : (
                   recentTransactions.map(t => (
                     <TransactionRow
