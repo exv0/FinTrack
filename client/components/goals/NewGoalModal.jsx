@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Trash2 } from 'lucide-react'
+import { X, Trash2, ImagePlus } from 'lucide-react'
+import { pickAndConvertImage } from '@/lib/imageUpload'
 import styles from './GoalModal.module.css'
 
-// Formats a Date/ISO string into yyyy-mm-dd for the <input type="date"> value
 function toDateInputValue(value) {
   if (!value) return ''
   const d = new Date(value)
@@ -12,27 +12,39 @@ function toDateInputValue(value) {
   return d.toISOString().slice(0, 10)
 }
 
-/**
- * Used for both creating a new goal and editing an existing one.
- * Pass `goal` to switch into edit mode — form pre-fills, button text changes,
- * and a Delete option appears. Omit `goal` (or pass null) for create mode.
- */
 export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, onDelete }) {
   const isEditMode = Boolean(goal)
 
   const [form, setForm] = useState({
-    name: goal?.name ?? '',
+    name:         goal?.name ?? '',
     targetAmount: goal?.targetAmount ?? '',
-    deadline: toDateInputValue(goal?.deadline),
+    deadline:     toDateInputValue(goal?.deadline),
   })
-  const [loading, setLoading] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState('')
+  const [photoPreview, setPhotoPreview] = useState(goal?.photo || null)
+  const [photoBase64, setPhotoBase64]   = useState(null)
+  const [photoError, setPhotoError]     = useState('')
+  const [loading, setLoading]           = useState(false)
+  const [deleting, setDeleting]         = useState(false)
+  const [error, setError]               = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const handleChange = (field) => (e) => {
     setForm(f => ({ ...f, [field]: e.target.value }))
     if (error) setError('')
+  }
+
+  const handlePickPhoto = async () => {
+    setPhotoError('')
+    const { base64, error: pickError } = await pickAndConvertImage()
+    if (pickError) { setPhotoError(pickError); return }
+    if (!base64) return
+    setPhotoPreview(base64)
+    setPhotoBase64(base64)
+  }
+
+  const handleRemovePhoto = () => {
+    setPhotoPreview(null)
+    setPhotoBase64('')
   }
 
   const handleSubmit = async (e) => {
@@ -44,10 +56,11 @@ export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, o
     }
 
     const payload = {
-      name: form.name.trim(),
+      name:         form.name.trim(),
       targetAmount: Number(form.targetAmount),
-      deadline: form.deadline || undefined,
+      deadline:     form.deadline || undefined,
     }
+    if (photoBase64 !== null) payload.photo = photoBase64
 
     setLoading(true)
     try {
@@ -58,7 +71,7 @@ export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, o
       }
       onClose()
     } catch {
-      setError(isEditMode ? 'Could not update goal. Please try again.' : 'Could not create goal. Please try again.')
+      setError(isEditMode ? 'Could not update goal.' : 'Could not create goal.')
       setLoading(false)
     }
   }
@@ -89,6 +102,25 @@ export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, o
           <form onSubmit={handleSubmit}>
             {error && <div className={styles.errorBanner}>{error}</div>}
 
+            {/* Goal photo */}
+            <div className={styles.photoSection}>
+              {photoPreview ? (
+                <div className={styles.photoPreviewWrap}>
+                  <img src={photoPreview} alt="Goal photo preview" className={styles.photoPreview} />
+                  <button type="button" className={styles.photoRemoveBtn} onClick={handleRemovePhoto}>
+                    Remove photo
+                  </button>
+                </div>
+              ) : (
+                <button type="button" className={styles.photoPickerBtn} onClick={handlePickPhoto}>
+                  <ImagePlus size={20} className={styles.photoPickerIcon} />
+                  <span>Add a photo for your goal</span>
+                  <span className={styles.photoPickerHint}>JPEG, PNG or WebP · Max 2MB</span>
+                </button>
+              )}
+              {photoError && <p className={styles.photoError}>{photoError}</p>}
+            </div>
+
             <label className={styles.label} htmlFor="goalName">Goal name</label>
             <input
               id="goalName"
@@ -97,7 +129,7 @@ export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, o
               value={form.name}
               onChange={handleChange('name')}
               className={styles.input}
-              autoFocus
+              autoFocus={!photoPreview}
             />
 
             <label className={styles.label} htmlFor="targetAmount">Target amount (NPR)</label>
@@ -128,11 +160,7 @@ export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, o
             </div>
 
             {isEditMode && (
-              <button
-                type="button"
-                className={styles.deleteLink}
-                onClick={() => setConfirmDelete(true)}
-              >
+              <button type="button" className={styles.deleteLink} onClick={() => setConfirmDelete(true)}>
                 <Trash2 size={13} /> Delete this goal
               </button>
             )}
@@ -141,8 +169,7 @@ export default function NewGoalModal({ goal = null, onClose, onCreate, onSave, o
           <div>
             {error && <div className={styles.errorBanner}>{error}</div>}
             <p className={styles.confirmText}>
-              Are you sure you want to delete <strong>&quot;{goal.name}&quot;</strong>?
-              This can&apos;t be undone.
+              Are you sure you want to delete <strong>&quot;{goal.name}&quot;</strong>? This can&apos;t be undone.
             </p>
             <div className={styles.buttonRow}>
               <button type="button" className={styles.btnGhost} onClick={() => setConfirmDelete(false)}>
