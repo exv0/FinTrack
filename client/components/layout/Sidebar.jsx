@@ -60,7 +60,12 @@ export default function Sidebar() {
 
       {/* User footer */}
       <div className={styles.footer}>
-        <div className={styles.avatar}>{initials}</div>
+        <div className={styles.avatar}>
+          {user?.avatar
+            ? <img src={user.avatar} alt="Avatar" className={styles.avatarImg} />
+            : initials
+          }
+        </div>
         <div className={styles.userInfo}>
           <span className={styles.userName}>{user?.firstName} {user?.lastName}</span>
           <button className={styles.signOut} onClick={handleLogout}>
