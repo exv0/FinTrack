@@ -119,7 +119,12 @@ export default function SettingsPage() {
         <div className={styles.col}>
           <SettingsCard title="Profile">
             <div className={styles.profileRow}>
-              <div className={styles.avatar}>{initials}</div>
+              <div className={styles.avatar}>
+                {user?.avatar
+                  ? <img src={user.avatar} alt="Avatar" className={styles.avatarImg} />
+                  : initials
+                }
+              </div>
               <div className={styles.profileInfo}>
                 <span className={styles.profileName}>{user?.firstName} {user?.lastName}</span>
                 <span className={styles.profileEmail}>{user?.email}</span>
