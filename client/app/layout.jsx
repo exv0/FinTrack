@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import RootProviders from '@/components/providers/RootProviders'
+import NavigationProgress from '@/components/ui/NavigationProgress'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -39,7 +40,10 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className={inter.className}>
-        <RootProviders>{children}</RootProviders>
+        <RootProviders>
+          <NavigationProgress />
+          {children}
+        </RootProviders>
       </body>
     </html>
   )

@@ -44,3 +44,145 @@ input, textarea, select { font-family: var(--font); }
 
 .fade-up  { animation: fadeUp  .25s ease both; }
 .fade-in  { animation: fadeIn  .2s  ease both; }
+
+/* ══════════════════════════════════════════════════
+   AMBIENT VISUAL EFFECTS
+   All four effects are layered on body/fixed elements.
+   Each is intentionally subtle — opacity is low.
+   ══════════════════════════════════════════════════ */
+
+/* ── D: Breathing dot pattern ────────────────────
+   Faint grid of dots that pulses opacity slowly.
+   Uses the existing auth-page pattern but globally. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  animation: dotBreathe 6s ease-in-out infinite;
+}
+
+@keyframes dotBreathe {
+  0%, 100% { opacity: .45; }
+  50%       { opacity: .15; }
+}
+
+/* ── C: Slow ambient accent blobs ────────────────
+   Two large blurred circles of accent color drifting
+   slowly — very low opacity so they don't overwhelm.
+   They're behind everything via z-index: 0. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 40% at 15% 85%, var(--accent) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 35% at 85% 10%, var(--accent) 0%, transparent 70%);
+  opacity: .09;
+  animation: blobDrift 28s ease-in-out infinite alternate;
+}
+
+[data-theme='dark'] body::after {
+  opacity: .14; /* slightly more visible on dark bg */
+}
+
+@keyframes blobDrift {
+  0%   { background-position: 15% 85%, 85% 10%; transform: scale(1)    rotate(0deg);   }
+  33%  {                                         transform: scale(1.08) rotate(1.5deg); }
+  66%  {                                         transform: scale(.96)  rotate(-1deg);  }
+  100% { background-position: 20% 75%, 80% 20%; transform: scale(1.04) rotate(.5deg);  }
+}
+
+/* ── A: Accent sweep on page load/transition ─────
+   A gradient that rises from bottom on .page-sweep.
+   Applied by NavigationProgress for 1.5s then removed. */
+.page-sweep {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--accent) 28%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 8%, transparent) 40%,
+    transparent 70%
+  );
+  animation: sweepUp 1.6s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+@keyframes sweepUp {
+  0%   { opacity: 0; transform: translateY(20px); }
+  15%  { opacity: 1; }
+  75%  { opacity: .6; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* ── B: Navigation progress bar ─────────────────
+   Thin accent line at top of screen on route change.
+   Driven by the NavigationProgress component. */
+.nav-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 70%, #fff),
+    var(--accent)
+  );
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 12px 2px var(--accent), 0 0 4px var(--accent);
+  animation: navProgress 500ms cubic-bezier(.4, 0, .2, 1) forwards;
+}
+
+@keyframes navProgress {
+  0%   { width: 0%;   opacity: 1; }
+  80%  { width: 95%;  opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
+/* Ensure page content sits above the fixed pseudo-elements */
+#__next, main, aside, header {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Card hover lift ─────────────────────────────
+   All white/surface cards get a subtle lift on hover.
+   The translateY + shadow shift gives physical depth. */
+[class*="card"]:not([class*="cardTitle"]):not([class*="cardHeader"]):not([class*="cardBg"]) {
+  transition:
+    transform .2s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow .2s ease,
+    background-color .18s ease,
+    border-color .18s ease;
+}
+[class*="card"]:not([class*="cardTitle"]):not([class*="cardHeader"]):not([class*="cardBg"]):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .08), 0 1px 4px rgba(0, 0, 0, .04);
+}
+
+[data-theme='dark'] [class*="card"]:not([class*="cardTitle"]):not([class*="cardHeader"]):not([class*="cardBg"]):hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .3), 0 1px 4px rgba(0, 0, 0, .15);
+}
+
+/* ── Button press feel ───────────────────────────
+   Primary/accent buttons get a tiny scale-down on click
+   so they feel physically pressable. */
+button:active:not(:disabled) {
+  transform: scale(.97);
+}
+
+/* ── Focus ring ──────────────────────────────────
+   Clean accent-colored focus ring for keyboard nav. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
